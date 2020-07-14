@@ -1,0 +1,36 @@
+version: '3.3'
+
+networks:
+        ntlog-network:
+                driver: bridge
+
+services:
+        httpd-srv:
+                build: ./apache-php
+                image: httpd-srv:v1
+                container_name: httpd-srv
+                ports:
+                        - "80:80"
+                        - "443:443"
+                volumes:
+                        - ./glpi:/var/www/html
+                networks:
+                        - ntlog-network
+                restart: always
+                depends_on:
+                        - mysql-db
+
+        mysql-db:
+                image: mariadb:10.4
+                container_name: mysql-db
+                expose:
+                    - "3306"
+                volumes:
+                        - ./mysql:/var/lib/mysql
+                networks:
+                        - ntlog-network
+                restart: always
+                environment:
+                        - MYSQL_ROOT_PASSWORD=mzt45d43
+                command: mysqld --default-authentication-plugin=mysql_native_password
+
